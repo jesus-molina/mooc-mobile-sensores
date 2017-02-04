@@ -1,11 +1,16 @@
 var app={
+  game: null,
+  colorNormal: '#f27d0c',
+  colorTocando: '#ff0000',
+
   inicio: function(){
     DIAMETRO_BOLA = 50;
     dificultad = 0;
     velocidadX = 0;
     velocidadY = 0;
     puntuacion = 0;
-    
+    hayColision = false;
+     
     alto  = document.documentElement.clientHeight;
     ancho = document.documentElement.clientWidth;
     
@@ -14,6 +19,7 @@ var app={
   },
 
   iniciaJuego: function(){
+
 /* function onError() {
       console.log('onError!');
     }
@@ -30,10 +36,14 @@ var app={
     document.querySelector(elementoHTML).innerHTML= redondeo;
   },
 */
+    var estados = { preload: preload, create: create, update: update };
+    var game = new Phaser.Game(ancho, alto, Phaser.CANVAS, 'phaser',estados);
+    app.game = game;
+
     function preload() {
       game.physics.startSystem(Phaser.Physics.ARCADE);
 
-      game.stage.backgroundColor = '#f27d0c';
+      game.stage.backgroundColor = app.colorNormal;
       game.load.image('bola', 'assets/bola.png');
       game.load.image('objetivo', 'assets/objetivo.png');
       game.load.image('objetivo2', 'assets/grinning.png');
@@ -59,6 +69,8 @@ var app={
     }
 
     function update(){
+      app.colorFondoJuego(); 
+
       var factorDificultad = (300 + (dificultad * 100));
       bola.body.velocity.y = (velocidadY * factorDificultad);
       bola.body.velocity.x = (velocidadX * (-1 * factorDificultad));
@@ -66,14 +78,22 @@ var app={
       game.physics.arcade.overlap(bola, objetivo, app.incrementaPuntuacion1, null, this);
       game.physics.arcade.overlap(bola, objetivo2, app.incrementaPuntuacion10, null, this);
     }
+  },
 
-    var estados = { preload: preload, create: create, update: update };
-    var game = new Phaser.Game(ancho, alto, Phaser.CANVAS, 'phaser',estados);
+  colorFondoJuego: function () {
+      if (hayColision === true) {
+        app.game.stage.backgroundColor = app.colorTocando;    
+      } else {
+        app.game.stage.backgroundColor = app.colorNormal;    
+      }
   },
 
   decrementaPuntuacion: function(){
+    hayColision = true;
     puntuacion = puntuacion-1;
     scoreText.text = puntuacion;
+
+    document.body.className = 'agitado';
   },
 
   incrementaPuntuacion1: function(){
@@ -141,6 +161,7 @@ var app={
   },
 
   registraDireccion: function(datosAceleracion){
+    hayColision = false;
     velocidadX = datosAceleracion.x ;
     velocidadY = datosAceleracion.y ;
   }
