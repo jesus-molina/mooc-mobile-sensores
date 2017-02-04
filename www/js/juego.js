@@ -10,13 +10,39 @@ var app={
     velocidadY = 0;
     puntuacion = 0;
     hayColision = false;
-     
+  
+    colorNormalInicialR = parseInt('f2', 16);
+    colorNormalInicialG = parseInt('7d', 16);
+    colorNormalInicialB = parseInt('0c', 16);
+    colorNormalR = colorNormalInicialR;
+    colorNormalG = colorNormalInicialG;
+    colorNormalB = colorNormalInicialB;
+    app.componeColor(0);
+
     alto  = document.documentElement.clientHeight;
     ancho = document.documentElement.clientWidth;
     
     app.vigilaSensores();
     app.iniciaJuego();
   },
+
+ componeColor: function(incremento) {
+    colorNormalR += incremento;
+    if (colorNormalR > 255 ) { colorNormalR = 255; }
+    if (colorNormalR < colorNormalInicialR ) { colorNormalR = colorNormalInicialR; }
+
+    colorNormalG += incremento;
+    if (colorNormalG > 255 ) { colorNormalG = 255; }
+    if (colorNormalG < colorNormalInicialG ) { colorNormalG = colorNormalInicialG; }
+
+    colorNormalB += incremento;
+    if (colorNormalB > 255 ) { colorNormalB = 255; }
+    if (colorNormalB < colorNormalInicialB) { colorNormalB = colorNormalInicialB; }
+
+     
+    app.colorNormal = '#' + (colorNormalR * parseInt('10000', 16) + colorNormalG * parseInt('100', 16) + colorNormalB).toString(16);  
+    //alert(app.colorNormal);
+ },
 
   iniciaJuego: function(){
 
@@ -52,16 +78,15 @@ var app={
 
     function create() {
       scoreText = game.add.text(16, 16, puntuacion, { fontSize: '100px', fill: '#757676' });
+      nivelText = game.add.text(16, alto - 32, 'Nivel ' + dificultad, { fontSize: '25px', fill: '#757676' });
       
       objetivo = game.add.sprite(app.inicioX(), app.inicioY(), 'objetivo');
       objetivo2 = game.add.sprite(app.inicioX(), app.inicioY(), 'objetivo2');
-
       bola = game.add.sprite(app.inicioX(), app.inicioY(), 'bola');
       
       game.physics.arcade.enable(bola);
       game.physics.arcade.enable(objetivo);
       game.physics.arcade.enable(objetivo2);
-
 
       bola.body.collideWorldBounds = true;
       bola.body.onWorldBounds = new Phaser.Signal();
@@ -93,7 +118,11 @@ var app={
     puntuacion = puntuacion-1;
     scoreText.text = puntuacion;
 
-    document.body.className = 'agitado';
+     if (dificultad > 0){
+      dificultad = dificultad - 1;
+      nivelText.text = 'Nivel ' + dificultad;
+      app.componeColor(-10);
+    }
   },
 
   incrementaPuntuacion1: function(){
@@ -105,6 +134,8 @@ var app={
 
     if (puntuacion > 0){
       dificultad = dificultad + 1;
+      nivelText.text = 'Nivel ' + dificultad;
+      app.componeColor(5);
     }
   },
 
@@ -117,6 +148,8 @@ var app={
 
     if (puntuacion > 0){
       dificultad = dificultad + 1;
+      nivelText.text = 'Nivel ' + dificultad;
+      app.componeColor(10);
     }
   },
 
