@@ -36,16 +36,22 @@ var app={
       game.stage.backgroundColor = '#f27d0c';
       game.load.image('bola', 'assets/bola.png');
       game.load.image('objetivo', 'assets/objetivo.png');
+      game.load.image('objetivo2', 'assets/grinning.png');
+
     }
 
     function create() {
       scoreText = game.add.text(16, 16, puntuacion, { fontSize: '100px', fill: '#757676' });
       
       objetivo = game.add.sprite(app.inicioX(), app.inicioY(), 'objetivo');
+      objetivo2 = game.add.sprite(app.inicioX(), app.inicioY(), 'objetivo2');
+
       bola = game.add.sprite(app.inicioX(), app.inicioY(), 'bola');
       
       game.physics.arcade.enable(bola);
       game.physics.arcade.enable(objetivo);
+      game.physics.arcade.enable(objetivo2);
+
 
       bola.body.collideWorldBounds = true;
       bola.body.onWorldBounds = new Phaser.Signal();
@@ -57,7 +63,8 @@ var app={
       bola.body.velocity.y = (velocidadY * factorDificultad);
       bola.body.velocity.x = (velocidadX * (-1 * factorDificultad));
       
-      game.physics.arcade.overlap(bola, objetivo, app.incrementaPuntuacion, null, this);
+      game.physics.arcade.overlap(bola, objetivo, app.incrementaPuntuacion1, null, this);
+      game.physics.arcade.overlap(bola, objetivo2, app.incrementaPuntuacion10, null, this);
     }
 
     var estados = { preload: preload, create: create, update: update };
@@ -69,12 +76,24 @@ var app={
     scoreText.text = puntuacion;
   },
 
-  incrementaPuntuacion: function(){
+  incrementaPuntuacion1: function(){
     puntuacion = puntuacion+1;
     scoreText.text = puntuacion;
 
     objetivo.body.x = app.inicioX();
     objetivo.body.y = app.inicioY();
+
+    if (puntuacion > 0){
+      dificultad = dificultad + 1;
+    }
+  },
+
+  incrementaPuntuacion10: function(){
+    puntuacion = puntuacion+10;
+    scoreText.text = puntuacion;
+
+    objetivo2.body.x = app.inicioX();
+    objetivo2.body.y = app.inicioY();
 
     if (puntuacion > 0){
       dificultad = dificultad + 1;
