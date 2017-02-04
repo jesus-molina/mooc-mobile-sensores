@@ -1,14 +1,23 @@
 var app={
   inicio: function(){
-    DIAMETRO_BOLA = 50; 
+    DIAMETRO_BOLA = 50;
+    velocidadX = 0;
+    velocidadY = 0;
+    puntuacion = 0;
+    
     alto  = document.documentElement.clientHeight;
     ancho = document.documentElement.clientWidth;
     
     app.vigilaSensores();
     app.iniciaJuego();
-    
   },
-/*
+
+  iniciaJuego: function(){
+/* function onError() {
+      console.log('onError!');
+    }
+  navigator.accelerometer.watchAcceleration(this.onSuccess, onError, {frequency: 1000});
+
   onSuccess: function(datosAceleracion){
     app.representa(datosAceleracion.x, '#valorx');
     app.representa(datosAceleracion.y, '#valory');    
@@ -19,20 +28,36 @@ var app={
     redondeo = Math.round(dato * 100) / 100;
     document.querySelector(elementoHTML).innerHTML= redondeo;
   },
-  */
-    iniciaJuego: function(){
-
+*/
     function preload() {
+      game.physics.startSystem(Phaser.Physics.ARCADE);
+
       game.stage.backgroundColor = '#f27d0c';
       game.load.image('bola', 'assets/bola.png');
-    };
+    }
 
-    function create() {  
-      game.add.sprite(app.inicioX(), app.inicioY(), 'bola');
-    };
+    function create() {
+      bola = game.add.sprite(app.inicioX(), app.inicioY(), 'bola');
+      game.physics.arcade.enable(bola);
+    }
 
-    var estados = { preload: preload, create: create };
+    function update(){
+      bola.body.velocity.y = (velocidadY * 300);
+      bola.body.velocity.x = (velocidadX * (-1 * 300));
+    }
+
+    var estados = { preload: preload, create: create, update: update };
     var game = new Phaser.Game(ancho, alto, Phaser.CANVAS, 'phaser',estados);
+  },
+
+  decrementaPuntuacion: function(){
+    puntuacion = puntuacion-1;
+    scoreText.text = puntuacion;
+  },
+
+  incrementaPuntuacion: function(){
+    puntuacion = puntuacion+1;
+    scoreText.text = puntuacion;
   },
 
   inicioX: function(){
@@ -46,18 +71,19 @@ var app={
   numeroAleatorioHasta: function(limite){
     return Math.floor(Math.random() * limite);
   },
+
   vigilaSensores: function(){
     
     function onError() {
         console.log('onError!');
-    };
+    }
 
     function onSuccess(datosAceleracion){
       app.detectaAgitacion(datosAceleracion);
-    };
+      app.registraDireccion(datosAceleracion);
+    }
 
-    navigator.accelerometer.watchAcceleration(onSuccess, onError,{ frequency: 1000 });
-
+    navigator.accelerometer.watchAcceleration(onSuccess, onError,{ frequency: 10 });
   },
 
   detectaAgitacion: function(datosAceleracion){
@@ -65,9 +91,19 @@ var app={
     var agitacionY = datosAceleracion.y > 10;
 
     if (agitacionX || agitacionY){
-      console.log('agitado');
+      setTimeout(app.recomienza, 1000);
     }
-  }  
+  },
+
+  recomienza: function(){
+    document.location.reload(true);
+  },
+
+  registraDireccion: function(datosAceleracion){
+    velocidadX = datosAceleracion.x ;
+    velocidadY = datosAceleracion.y ;
+  }
+
 };
 
 if ('addEventListener' in document) {
