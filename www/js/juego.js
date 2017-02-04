@@ -34,16 +34,28 @@ var app={
 
       game.stage.backgroundColor = '#f27d0c';
       game.load.image('bola', 'assets/bola.png');
+      game.load.image('objetivo', 'assets/objetivo.png');
     }
-
+    
     function create() {
+      scoreText = game.add.text(16, 16, puntuacion, { fontSize: '100px', fill: '#757676' });
+      
+      objetivo = game.add.sprite(app.inicioX(), app.inicioY(), 'objetivo');
       bola = game.add.sprite(app.inicioX(), app.inicioY(), 'bola');
+      
       game.physics.arcade.enable(bola);
+      game.physics.arcade.enable(objetivo);
+
+      bola.body.collideWorldBounds = true;
+      bola.body.onWorldBounds = new Phaser.Signal();
+      bola.body.onWorldBounds.add(app.decrementaPuntuacion, this);
     }
 
     function update(){
       bola.body.velocity.y = (velocidadY * 300);
       bola.body.velocity.x = (velocidadX * (-1 * 300));
+      
+      game.physics.arcade.overlap(bola, objetivo, app.incrementaPuntuacion, null, this);
     }
 
     var estados = { preload: preload, create: create, update: update };
@@ -58,6 +70,9 @@ var app={
   incrementaPuntuacion: function(){
     puntuacion = puntuacion+1;
     scoreText.text = puntuacion;
+
+    objetivo.body.x = app.inicioX();
+    objetivo.body.y = app.inicioY();
   },
 
   inicioX: function(){
@@ -91,6 +106,7 @@ var app={
     var agitacionY = datosAceleracion.y > 10;
 
     if (agitacionX || agitacionY){
+      /* console.log('agitado'); */
       setTimeout(app.recomienza, 1000);
     }
   },
